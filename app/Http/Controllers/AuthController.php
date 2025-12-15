@@ -8,6 +8,7 @@ use App\Models\Role;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SendMail;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -109,5 +110,44 @@ class AuthController extends Controller
         $user->save();
 
         return redirect('/dashboard');
+    }
+
+    // Show Login Form
+    public function showLoginForm()
+    {
+        return view('auth.login');
+    }
+
+    // Process Login
+    public function login(Request $request)
+    {
+        // 1. Validate: 'login' can be email or username
+        $request->validate([
+            'login' => 'required|string', 
+            'password' => 'required|string',
+        ]);
+    
+        // 2. Find the user (Check Email OR Username)
+        $user = User::where('email', $request->login)
+                    ->orWhere('username', $request->login)
+                    ->first();
+    
+        // 3. If User exists AND Password matches
+        if ($user && Hash::check($request->password, $user->password)) {
+            
+            // 4. Check Verification
+            if ($user->email_verified_at == null) {
+                return redirect()->route('auth.verify')
+                    ->withErrors(['email' => 'Please verify your email first.']);
+            }
+    
+            // 5. Manually Log the user in
+            Auth::login($user);
+    
+            return redirect()->intended('/dashboard');
+        }
+    
+        // 6. Failure
+        return back()->with('error', 'Invalid credentials.');
     }
 }
