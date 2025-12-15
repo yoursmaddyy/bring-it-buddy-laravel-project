@@ -150,4 +150,12 @@ class AuthController extends Controller
         // 6. Failure
         return back()->with('error', 'Invalid credentials.');
     }
+
+    // Handle Logout
+// Handle Logout
+        public function logout()
+        {
+            Auth::logout(); // This clears the logged-in user
+            return redirect()->route('login');
+        }
 }
