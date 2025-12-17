@@ -133,7 +133,7 @@ class AuthController extends Controller
                     ->first();
     
         // 3. If User exists AND Password matches
-        if ($user && Hash::check($request->password, $user->password)) {
+        if ($user && password_verify($request->password, $user->password)) {
             
             // 4. Check Verification
             if ($user->email_verified_at == null) {
