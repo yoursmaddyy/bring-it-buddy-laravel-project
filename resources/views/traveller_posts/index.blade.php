@@ -1,37 +1,86 @@
 @extends('layouts.app')
 
 @section('content')
-    <h2>Available Travellers</h2>
+<div class="container">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold" style="color: var(--primary-teal);">Available Trips</h2>
+            <p class="text-muted">Find a traveller going your way.</p>
+        </div>
+        </div>
 
     @if($posts->isEmpty())
-        <p>No trips available right now.</p>
+        <div class="text-center py-5">
+            <div class="mb-3" style="font-size: 3rem;">✈️</div>
+            <h4 class="text-muted">No trips available right now.</h4>
+            <p>Check back later or post a request to notify travellers.</p>
+        </div>
     @else
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+        <div class="row g-4">
             @foreach($posts as $post)
-                <div style="border: 1px solid #ccc; padding: 20px; border-radius: 8px; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    
-                    <h3 style="margin-top:0; color: #333;">
-                        {{ $post->from_location }} ➝ {{ $post->to_location }}
-                    </h3>
-                    
-                    <p style="color: #666; font-size: 0.9em; margin-bottom: 15px;">
-                        <strong>Traveller:</strong> {{ $post->user->name ?? 'Unknown' }}
-                    </p>
-                    
-                    <hr style="border: 0; border-top: 1px solid #eee;">
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 shadow-sm border-0 transition-hover">
+                        <div class="card-body p-4 d-flex flex-column">
+                            
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <h5 class="fw-bold mb-0 text-dark">
+                                    {{ $post->from_location }} 
+                                    <span style="color: var(--primary-teal);">&rarr;</span> 
+                                    {{ $post->to_location }}
+                                </h5>
+                            </div>
 
-                    <p><strong>📅 Date:</strong> {{ $post->travel_date }}</p>
-                    <p><strong>📦 Space:</strong> {{ $post->available_space }} kg</p>
-                    <p><strong>💰 Fee:</strong> Rs. {{ number_format($post->fee) }}</p>
-                    <p><strong>⚖️ Preference:</strong> {{ ucfirst($post->preference) }}</p>
-                    
-                    <a href="{{ route('buyer.create', $post->id) }}" 
-                       class="btn" 
-                       style="display: block; text-align: center; background: #28a745; color: white; padding: 10px; text-decoration: none; border-radius: 4px; margin-top: 15px;">
-                        Request Delivery
-                    </a>
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center text-secondary fw-bold" style="width: 35px; height: 35px; margin-right: 10px;">
+                                    {{ substr($post->user->name ?? 'U', 0, 1) }}
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block" style="line-height: 1;">Traveller</small>
+                                    <span class="fw-bold text-secondary">{{ $post->user->name ?? 'Unknown' }}</span>
+                                </div>
+                            </div>
+
+                            <hr class="text-muted opacity-25">
+
+                            <div class="row g-2 mb-3">
+                                <div class="col-6">
+                                    <small class="text-muted">Date</small>
+                                    <div class="fw-medium text-dark">📅 {{ \Carbon\Carbon::parse($post->travel_date)->format('M d, Y') }}</div>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted">Capacity</small>
+                                    <div class="fw-medium text-dark">📦 {{ $post->available_space }} kg</div>
+                                </div>
+                                <div class="col-6 mt-3">
+                                    <small class="text-muted">Service Fee</small>
+                                    <div class="fw-bold text-success">Rs. {{ number_format($post->fee) }}</div>
+                                </div>
+                                <div class="col-6 mt-3">
+                                    <small class="text-muted">Accepts</small>
+                                    <div>
+                                        @if($post->preference == 'lightweight')
+                                            <span class="badge bg-info text-dark rounded-pill">Lightweight</span>
+                                        @elseif($post->preference == 'heavy')
+                                            <span class="badge bg-warning text-dark rounded-pill">Heavy</span>
+                                        @else
+                                            <span class="badge bg-secondary rounded-pill">Any Item</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-auto pt-2">
+                                <a href="{{ route('buyer.create', $post->id) }}" class="btn btn-teal w-100 fw-bold">
+                                    Request Delivery
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
                 </div>
             @endforeach
         </div>
     @endif
+</div>
 @endsection

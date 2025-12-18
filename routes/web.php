@@ -10,10 +10,10 @@ Route::get('/register-form', [AuthController::class, 'showRegistrationForm'])->n
 Route::post('/register-submit', [AuthController::class, 'store'])->name('register.post');
 
 Route::get('/verify-account-enter-email', [AuthController::class, 'showVerify'])->name('auth.verify');
-Route::post('/verify-account-enter-email', [AuthController::class, 'sendOtp'])->name('otp.send');
+Route::post('/verify-account-enter-email', [AuthController::class, 'sendOtp'])->name('auth.otp.send');
 
 Route::get('/verify-account-enter-otp', [AuthController::class, 'showOtpConfirm'])->name('auth.otp.confirm');
-Route::post('/verify-account-check-otp', [AuthController::class, 'verifyOtp'])->name('otp.check');
+Route::post('/verify-account-check-otp', [AuthController::class, 'verifyOtp'])->name('auth.otp.check');
 
 // ... existing verify routes ...
 
@@ -76,4 +76,13 @@ Route::middleware('auth')->group(function () {
     // Accept/Reject Action
     Route::put('/request/{id}/status', [TravellerController::class, 'updateRequestStatus'])->name('traveller.request.update');
 
+});
+
+Route::middleware(['auth', 'can:admin'])->prefix('admin')->group(function () {
+    // Route::get('/panel', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    
+    // Admin Actions
+    Route::delete('/user/{id}', [AdminController::class, 'deleteUser'])->name('admin.delete_user');
+    Route::delete('/trip/{id}', [AdminController::class, 'deleteTrip'])->name('admin.delete_trip');
+    Route::delete('/order/{id}', [AdminController::class, 'deleteOrder'])->name('admin.delete_order');
 });
